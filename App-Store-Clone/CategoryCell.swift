@@ -15,6 +15,7 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
             if let name = appCategory?.name {
                 nameLabel.text = name
             }
+            appsCollectionView.reloadData()
         }
     }
     
@@ -36,7 +37,6 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Best New Apps"
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
