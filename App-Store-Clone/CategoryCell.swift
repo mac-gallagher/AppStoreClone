@@ -10,6 +10,8 @@ import UIKit
 
 class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate{
     
+    var featuredAppsController: FeaturedAppsController?
+    
     var appCategory: AppCategory? {
         didSet {
             if let name = appCategory?.name {
@@ -94,6 +96,12 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let app = appCategory?.apps?[indexPath.item] {
+        featuredAppsController?.showAppDetailForApp(app: app)
+        }
     }
     
 }

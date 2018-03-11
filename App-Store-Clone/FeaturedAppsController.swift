@@ -14,12 +14,14 @@ class FeaturedAppsController: UICollectionViewController, UICollectionViewDelega
     var bannerCategory: AppCategory?
     
     private let headerId = "headerId"
+    private let cellId = "cellId"
+    private let largeCellId = "largeCellId"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView?.backgroundColor = .white
-        collectionView?.register(CategoryCell.self, forCellWithReuseIdentifier: "cellId")
-        collectionView?.register(LargeCategoryCell.self, forCellWithReuseIdentifier: "largeCellId")
+        collectionView?.register(CategoryCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(LargeCategoryCell.self, forCellWithReuseIdentifier: largeCellId)
         collectionView?.register(Header.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: headerId)
         
         navigationItem.title = "Featured Apps"
@@ -49,17 +51,25 @@ class FeaturedAppsController: UICollectionViewController, UICollectionViewDelega
         }.resume()
     }
     
+    func showAppDetailForApp(app: App) {
+        let layout = UICollectionViewFlowLayout()
+        let appDetailController = AppDetailController(collectionViewLayout: layout)
+        appDetailController.app = app
+        navigationController?.pushViewController(appDetailController, animated: true)
+    }
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if indexPath.item == 2 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "largeCellId", for: indexPath) as! LargeCategoryCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: largeCellId, for: indexPath) as! LargeCategoryCell
             cell.appCategory = appCategories?[indexPath.item]
-            
+            cell.featuredAppsController = self
             return cell
         }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellId", for: indexPath) as! CategoryCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! CategoryCell
         cell.appCategory = appCategories?[indexPath.item]
+        cell.featuredAppsController = self
         return cell
     }
     
@@ -88,6 +98,7 @@ class FeaturedAppsController: UICollectionViewController, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: view.frame.width, height: 120)
     }
+    
 
 }
 
