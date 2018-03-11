@@ -24,6 +24,9 @@ struct App: Decodable {
     let category: String?
     let imageName: String?
     let price: Double?
+    let screenshots: [String]?
+    let desc: String?
+    let appInformation: [[String:String]]?
     
     enum CodingKeys: String, CodingKey {
         case id = "Id"
@@ -31,5 +34,8 @@ struct App: Decodable {
         case category = "Category"
         case imageName = "ImageName"
         case price = "Price"
+        case screenshots = "Screenshots"
+        case desc = "description"
+        case appInformation = "appInformation"
     }
 }
