@@ -1,6 +1,6 @@
 //
 //  CategoryCell.swift
-//  App-Store-Clone
+//  AppStoreClone
 //
 //  Created by Mac Gallagher on 3/9/18.
 //  Copyright © 2018 Mac Gallagher. All rights reserved.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate{
+class CategoryCell: BaseCell, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate {
     
     var featuredAppsController: FeaturedAppsController?
     
@@ -30,37 +30,27 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
         return collectionView
     }()
     
-    let dividerLineView: UIView = {
+    private let dividerLineView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.4, alpha: 0.4)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    let nameLabel: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    
     private let appCellId = "appCellId"
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupViews() {
+    override func setupViews() {
+        super.setupViews()
         backgroundColor = UIColor.clear
         
         appsCollectionView.register(AppCell.self, forCellWithReuseIdentifier: appCellId)
-        
         appsCollectionView.dataSource = self
         appsCollectionView.delegate = self
         
@@ -69,18 +59,13 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
         addSubview(nameLabel)
         
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-14-[v0]|", options: NSLayoutFormatOptions(), metrics: nil, views:  ["v0": nameLabel]))
-        
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-14-[v0]|", options: NSLayoutFormatOptions(), metrics: nil, views:  ["v0": dividerLineView]))
-        
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[v0]|", options: NSLayoutFormatOptions(), metrics: nil, views:  ["v0": appsCollectionView]))
-        
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[nameLabel(30)][v0][v1(0.5)]|", options: NSLayoutFormatOptions(), metrics: nil, views:  ["nameLabel": nameLabel, "v0": appsCollectionView, "v1": dividerLineView]))
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let count = appCategory?.apps?.count {
-            return count
-        }
+        if let count = appCategory?.apps?.count { return count }
         return 0
     }
     
@@ -106,36 +91,12 @@ class CategoryCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UI
     
 }
 
-class AppCell: UICollectionViewCell {
+class AppCell: BaseCell {
     
     var app: App? {
         didSet {
-            if let name = app?.name {
-                nameLabel.text = name
-                let rect = String(name).boundingRect(with: CGSize(width: frame.width, height: 1000), options: NSStringDrawingOptions.usesFontLeading.union(NSStringDrawingOptions.usesLineFragmentOrigin), attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)], context: nil)
-                if rect.height > 20 {
-                    categoryLabel.frame = CGRect(x: 0, y: frame.width + 38, width: frame.width, height: 20)
-                    priceLabel.frame = CGRect(x: 0, y: frame.width + 56, width: frame.width, height: 20)
-                } else {
-                    categoryLabel.frame = CGRect(x: 0, y: frame.width + 22, width: frame.width, height: 20)
-                    priceLabel.frame = CGRect(x: 0, y: frame.width + 40, width: frame.width, height: 20)
-                }
-                
-                nameLabel.frame = CGRect(x: 0, y: frame.width + 5, width: frame.width, height: 40)
-                nameLabel.sizeToFit()
-                
-            }
-            if let category = app?.category {
-                categoryLabel.text = category
-            }
-            if let price = app?.price {
-                priceLabel.text = "$\(price)"
-            } else {
-                priceLabel.text = "Free"
-            }
-            if let imageName = app?.imageName {
-                imageView.image = UIImage(named: imageName)
-            }
+            guard let app = app else { return }
+            configure(app)
         }
     }
     
@@ -147,37 +108,28 @@ class AppCell: UICollectionViewCell {
         return iv
     }()
     
-    let nameLabel: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 2
         return label
     }()
     
-    let categoryLabel: UILabel = {
+    private let categoryLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .darkGray
         return label
     }()
     
-    let priceLabel: UILabel = {
+    private let priceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .darkGray
         return label
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupView() {
+    override func setupViews() {
         addSubview(imageView)
         addSubview(nameLabel)
         addSubview(categoryLabel)
@@ -187,7 +139,36 @@ class AppCell: UICollectionViewCell {
         nameLabel.frame = CGRect(x: 0, y: frame.width + 2, width: frame.width, height: 40)
         categoryLabel.frame = CGRect(x: 0, y: frame.width + 38, width: frame.width, height: 20)
         priceLabel.frame = CGRect(x: 0, y: frame.width + 56, width: frame.width, height: 20)
+    }
+    
+    private func configure(_ app: App) {
+        if let name = app.name {
+            nameLabel.text = name
+            let rect = String(name).boundingRect(with: CGSize(width: frame.width, height: 1000), options: NSStringDrawingOptions.usesFontLeading.union(NSStringDrawingOptions.usesLineFragmentOrigin), attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)], context: nil)
+            if rect.height > 20 {
+                categoryLabel.frame = CGRect(x: 0, y: frame.width + 38, width: frame.width, height: 20)
+                priceLabel.frame = CGRect(x: 0, y: frame.width + 56, width: frame.width, height: 20)
+            } else {
+                categoryLabel.frame = CGRect(x: 0, y: frame.width + 22, width: frame.width, height: 20)
+                priceLabel.frame = CGRect(x: 0, y: frame.width + 40, width: frame.width, height: 20)
+            }
+            nameLabel.frame = CGRect(x: 0, y: frame.width + 5, width: frame.width, height: 40)
+            nameLabel.sizeToFit()
+        }
         
+        if let category = app.category {
+            categoryLabel.text = category
+        }
+        
+        if let price = app.price {
+            priceLabel.text = "$\(price)"
+        } else {
+            priceLabel.text = "Free"
+        }
+        
+        if let imageName = app.imageName {
+            imageView.image = UIImage(named: imageName)
+        }
     }
     
 }

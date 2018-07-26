@@ -1,6 +1,6 @@
 //
 //  Models.swift
-//  App-Store-Clone
+//  AppStoreClone
 //
 //  Created by Mac Gallagher on 3/10/18.
 //  Copyright © 2018 Mac Gallagher. All rights reserved.

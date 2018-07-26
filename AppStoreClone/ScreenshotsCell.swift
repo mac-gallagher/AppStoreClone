@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  App-Store-Clone
+//  ScreenshotsCell.swift
+//  AppStoreClone
 //
 //  Created by Mac Gallagher on 3/11/18.
 //  Copyright © 2018 Mac Gallagher. All rights reserved.
@@ -16,7 +16,7 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
         }
     }
     
-    let collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -26,7 +26,7 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
     
     private let cellId = "cellId"
     
-    let dividerLineView: UIView = {
+    private let dividerLineView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.4, alpha: 0.4)
         return view
@@ -34,7 +34,6 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
     
     override func setupViews() {
         super.setupViews()
-        
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -42,13 +41,9 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
         addSubview(dividerLineView)
         
         addConstraintsWithFormat(format: "H:|[v0]|", views: collectionView)
-        
         addConstraintsWithFormat(format: "H:|-14-[v0]|", views: dividerLineView)
-        
         addConstraintsWithFormat(format: "V:|[v0][v1(1)]|", views: collectionView, dividerLineView)
-        
         collectionView.register(ScreenshotImageCell.self, forCellWithReuseIdentifier: cellId)
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -60,11 +55,9 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ScreenshotImageCell
-        
         if let imageName = app?.screenshots?[indexPath.item] {
              cell.imageView.image = UIImage(named: imageName)
         }
-        
         return cell
     }
     
@@ -85,14 +78,13 @@ class ScreenShotsCell: BaseCell, UICollectionViewDelegate, UICollectionViewDataS
         }()
         
         override func setupViews() {
-            
             layer.masksToBounds = true
-            
             addSubview(imageView)
             addConstraintsWithFormat(format: "H:|[v0]|", views: imageView)
             addConstraintsWithFormat(format: "V:|[v0]|", views: imageView)
         }
+        
     }
     
-    
 }
+

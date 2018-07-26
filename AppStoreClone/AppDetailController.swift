@@ -1,6 +1,6 @@
 //
 //  AppDetailController.swift
-//  App-Store-Clone
+//  AppStoreClone
 //
 //  Created by Mac Gallagher on 3/11/18.
 //  Copyright © 2018 Mac Gallagher. All rights reserved.
@@ -12,13 +12,12 @@ class AppDetailController: UICollectionViewController, UICollectionViewDelegateF
     
     var app: App?
     
-    let headerId = "headerId"
-    let cellId = "cellId"
-    let descriptionCellId = "descriptionCellId"
+    private let headerId = "headerId"
+    private let cellId = "cellId"
+    private let descriptionCellId = "descriptionCellId"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = .white
         collectionView?.register(AppDetailHeader.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: headerId)
@@ -30,14 +29,12 @@ class AppDetailController: UICollectionViewController, UICollectionViewDelegateF
                 self.collectionView?.reloadData()
             }
         }
-        
     }
     
-    func fetchAppDetails(id: Int, completionHandler: @escaping (App) -> ()) {
+    private func fetchAppDetails(id: Int, completionHandler: @escaping (App) -> ()) {
         let urlString = "https://api.letsbuildthatapp.com/appstore/appdetail?id=\(id)"
         URLSession.shared.dataTask(with: URL(string: urlString)!) { (data, response, error) in
             guard let data = data else { return }
-            
             do {
                 let appWithDetails = try JSONDecoder().decode(App.self, from: data)
                 DispatchQueue.main.async {
@@ -46,13 +43,12 @@ class AppDetailController: UICollectionViewController, UICollectionViewDelegateF
             } catch let err{
                 print(err)
             }
-            
-            }.resume()
+        }.resume()
     }
     
     private func descriptionAttributedText() -> NSAttributedString {
         let attributedText = NSMutableAttributedString(string: "Description\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        
+
         let style = NSMutableParagraphStyle()
         style.lineSpacing = 10
         
@@ -71,7 +67,6 @@ class AppDetailController: UICollectionViewController, UICollectionViewDelegateF
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         if indexPath.item == 1 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: descriptionCellId, for: indexPath) as! AppDetailDescriptionCell
             cell.textView.attributedText = descriptionAttributedText()
@@ -84,16 +79,12 @@ class AppDetailController: UICollectionViewController, UICollectionViewDelegateF
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         if indexPath.item == 1 {
-            
             let dummySize = CGSize(width: view.frame.width - 8 - 8, height: 1000)
             let options = NSStringDrawingOptions.usesFontLeading.union(NSStringDrawingOptions.usesLineFragmentOrigin)
             let rect = descriptionAttributedText().boundingRect(with: dummySize, options: options, context: nil)
-            
             return CGSize(width: view.frame.width, height: rect.height + 30)
         }
-        
         return CGSize(width: view.frame.width, height: 170)
     }
     
@@ -113,18 +104,12 @@ class AppDetailHeader: BaseCell {
     
     var app: App? {
         didSet {
-            if let imageName = app?.imageName {
-                imageView.image = UIImage(named: imageName)
-            }
-            nameLabel.text = app?.name
-            
-            if let price = app?.price {
-                buyButton.setTitle("$\(price)", for: .normal)
-            }
+            guard let app = app else { return }
+            configure(app)
         }
     }
     
-    let imageView: UIImageView = {
+    private let imageView: UIImageView = {
        let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         iv.layer.cornerRadius = 16
@@ -132,21 +117,21 @@ class AppDetailHeader: BaseCell {
         return iv
     }()
     
-    let segmentedControl: UISegmentedControl = {
+    private let segmentedControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["Details", "Reviews", "Related"])
         sc.tintColor = .darkGray
         sc.selectedSegmentIndex = 0
         return sc
     }()
     
-    let nameLabel: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = "TEXT"
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
     
-    let buyButton: UIButton = {
+    private let buyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Buy", for: .normal)
         button.layer.borderColor = UIColor(red: 0, green: 129/255, blue: 250/255, alpha: 1).cgColor
@@ -156,14 +141,14 @@ class AppDetailHeader: BaseCell {
         return button
     }()
     
-    let dividerLineView: UIView = {
+    private let dividerLineView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.4, alpha: 0.4)
         return view
     }()
     
     override func setupViews() {
-        
+        super.setupViews()
         addSubview(imageView)
         addSubview(segmentedControl)
         addSubview(nameLabel)
@@ -184,6 +169,17 @@ class AppDetailHeader: BaseCell {
         addConstraintsWithFormat(format: "H:|[v0]|", views: dividerLineView)
         addConstraintsWithFormat(format: "V:[v0(0.5)]|", views: dividerLineView)
     }
+    
+    private func configure(_ app: App) {
+        if let imageName = app.imageName {
+            imageView.image = UIImage(named: imageName)
+        }
+        nameLabel.text = app.name
+        
+        if let price = app.price {
+            buyButton.setTitle("$\(price)", for: .normal)
+        }
+    }
 }
 
 class AppDetailDescriptionCell: BaseCell {
@@ -194,7 +190,7 @@ class AppDetailDescriptionCell: BaseCell {
         return tv
     }()
     
-    let dividerLineView: UIView = {
+    private let dividerLineView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.4, alpha: 0.4)
         return view
@@ -202,18 +198,13 @@ class AppDetailDescriptionCell: BaseCell {
     
     override func setupViews() {
         super.setupViews()
-        
         addSubview(textView)
         addSubview(dividerLineView)
-        
         addConstraintsWithFormat(format: "H:|-8-[v0]-8-|", views: textView)
         addConstraintsWithFormat(format: "H:|-14-[v0]|", views: dividerLineView)
-        
         addConstraintsWithFormat(format: "V:|-4-[v0]-4-[v1(1)]|", views: textView, dividerLineView)
-        
-        
-        
     }
+    
 }
 
 extension UIView {
@@ -226,20 +217,5 @@ extension UIView {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: NSLayoutFormatOptions(), metrics: nil, views: viewsDictionary))
-    }
-}
-
-class BaseCell: UICollectionViewCell {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupViews() {
-        
     }
 }
